@@ -1,0 +1,21 @@
+void
+uno_check(void)
+{
+        if (fct_call("fopen"))
+	{	if (on_track(DEF, 0))
+			error("fopen of unclosed fd");
+		else
+			add_track(DEF, 0);
+	}
+	if (fct_call("fclose"))
+	{	if (match_track(USE, 0))	/* the fd used here was added as def before */
+			del_name(USE, 0);	/* now delete it */
+		else
+			error("closing an unopened fd");
+	}
+
+	if (path_ends())
+	{	if (any_track(DEF, 0))	/* if anything on track */
+			error("fopen without fclose");
+	}
+}

@@ -1,0 +1,27 @@
+#
+# Selftest for Uno, for Windows PC installations
+# expect lots of complaints from global analysis
+# but mostly on the generated files lexer.c and c_gram.c
+#
+
+bison -v -d -o c_gram.c c_gram.y 2> null
+flex -C -olexer.c lexer.l
+rm -f null
+
+echo "Uno:"
+echo "===="
+	uno -DPC -u uno.c
+
+echo "Uno_global:"
+echo "=========="
+	uno -DPC -u uno_global.c uno_fcts.c
+
+# this takes the longest, mostly to check lexer.c
+echo "Uno_local:"
+echo "========="
+	uno -DPC -u uno_local.c dflow.c c_gram.c heap.c \
+		nmetab.c prnttree.c symtab.c token.c tree.c \
+		treestk.c uno_bounds.c lexer.c \
+		uno_generic.c uno_intervals.c uno_lts.c
+
+rm -f c_gram.[ch] c_gram.output lexer.c

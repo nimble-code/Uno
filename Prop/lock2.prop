@@ -1,0 +1,22 @@
+
+void
+uno_check(void)
+{
+        if (fct_call("qunlock"))
+	{	if (on_track(USE, 0))
+			del_track(USE, 0);
+		else
+			error("unlock while unlocked");
+	}
+	if (fct_call("qlock"))
+	{	if (on_track(USE, 0))
+			error("lock while locked");
+		else
+			add_track(USE, 0);
+	}
+
+	if (path_ends())
+	{	if (any_track(USE, 0))	/* if anything on track */
+			error("lock without unlock");
+	}
+}

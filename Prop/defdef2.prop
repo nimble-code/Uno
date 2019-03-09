@@ -1,0 +1,15 @@
+void
+uno_check(void)
+{
+	if (select("", USE|USEafterdef, NONE))
+	if (match(1, DEF, NONE))
+		unmark();
+
+	if (select("", DEF, REF1|REF2|REF0))
+	{	// list();
+		if (match(1, ANY, NONE))
+			error("def after def");
+		else
+			mark(1);
+	}
+}

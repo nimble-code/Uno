@@ -1,0 +1,11 @@
+void
+uno_check(void)
+{
+	if (select("", PARAM, DECL))	/* parameter uses, after decl */
+	if (refine(DEREF|REF0, NONE))	/* deref with * or -> */
+	{	if (known_nonzero())
+			no_error();
+		else
+			error("dereferencing possibly nil parameter");
+	}
+}

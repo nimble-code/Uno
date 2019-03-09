@@ -1,0 +1,16 @@
+void
+uno_check(void)					// default global check
+{
+	if (select("", DEF, NONE))
+		mark(1);			// mark vars assigned a value
+
+	if (select("", USE|DEREF, NONE))	// using or derefencing a variable
+	{	if (match(1, DEF, NONE))	// previous DEF, good
+			no_error();
+		else				// no previous DEF
+		{	if (known_nonzero())
+				no_error();
+			else
+				error("global use or deref before def");
+	}	}
+}

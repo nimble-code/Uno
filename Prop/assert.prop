@@ -1,0 +1,10 @@
+// this takes a spec of 14 non-comment lines in Metal (Engler, Fig. 3)
+
+void
+uno_check(void)		// check for side-effects in assertions
+{
+	if (select("assert", FCALL, NONE))	// statement of interest
+	if (select("", DEF|FCALL, NONE))	// pickout all defines and fcalls
+	if (unselect("assert", ANY, NONE))	// assert will be among the fcalls
+		error("side effect or fct call in assert");
+}

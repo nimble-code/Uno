@@ -1,0 +1,17 @@
+void
+uno_check(void)
+{
+	if (select("waserror", FCALL, NONE))
+		mark(1);
+	if (path_ends())
+	{	if (marked(1, ANY, NONE))
+		{	if (known_zero())
+				error("zero path");
+			if (known_nonzero())
+				error("nonzero path");
+			else
+				no_error("not nonzero");
+		} else
+			error("no waserror");
+	}
+}

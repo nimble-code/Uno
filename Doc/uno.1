@@ -1,0 +1,193 @@
+.ds U U\s-2NO\s0
+.TH UNO 1
+.CT 1 program_analysis nil_pointers
+.SH NAME
+uno \(mi static analysis tool for ANSI-C programs
+.SH SYNOPSIS
+.B uno
+.BI "[-D...] [-U...] [-I...] [-CPP=...] [-a] [-g x] [-h] [-l] [-m x] [-n] [-p x] [-s] [-t] [-u] [-V] [-v] [-w] [-x f] \f1*.c"
+.SH DESCRIPTION
+\*U is a tool for analyzing programs written in ANSI-C.
+By default, the tool scans the sources for the three
+most commonly occuring defects of C programs:
+use of \f2u\f1ninitialized variables, \f2n\f1il-pointer
+dereferencing problems, and \f2o\f1ut-of-bound array
+indexing problems. It can optionally also report on a
+series of other, more cosmetic, flaws of the code, such
+as redundant variable and function declarations, unused
+fields in structures, variables set but not used, the
+use of conditions with side-effects, etc.
+.PP
+The \*U analysis proceeds in two phases: a local analysis
+of each function in the code, and a global analysis for the
+entire program. The local analysis can be done on also
+incomplete code, but the global analysis expects a complete
+program that can be searched starting from the \f2main()\f1
+routine.
+.PP
+\*U allows the user to define new properties
+to check for, by writing simple C-functions that
+encode the required check. The properties can
+specify either a local check, applied to each function
+separately, or a global check, applied to the program
+as a whole.  The local check applies to the use of
+local variables of any type, the global check applies
+to the use of global pointers only.
+.PP
+The first group of options allows for the definition of
+compiler directives on the command line, to guide the
+preprocessing of the sources.
+.TP
+.B "-Dname=def"
+Define
+.B name
+with value
+.B def
+as if by a \f2#define\f1.
+.TP
+.B "-Dname"
+Define
+.B name
+with value 1.
+.TP
+.B "-Idir"
+Add directory
+.B dir
+to the list of directories that is searched by the preprocessor
+for include files.
+.TP
+.B "-Uname"
+Remove any definitions of name, where name is a
+reserved symbol that may be predefined by the preprocessor.
+If present, this action supersedes the possible use of 
+.B "-D"
+for the same symbol, irrespective of the order in which
+these options are given.
+.TP
+.B "-CPP=..."
+Set the preprocessor to the name specified. For instance,
+\fBCPP="cl -EP -nologo"\f1.
+.PP
+The next set of options controls how the analysis is performed.
+.TP
+.B -a
+Report all error paths in the local analyses, rather than only paths
+that end in distinct statements in the source.
+.TP
+.B "-g x"
+Check the \f2global\f1 property definition stored in file \f2x\f1,
+instead of the default property for the use or dereferencing
+of uninitialized global pointers (by default initialized to zero).
+By convention, the property function must be
+declared as \f2void uno_check(void) {}\f1.
+.TP
+.B -h
+or
+.B -help
+Prints a usage summary with the main tool options.
+.TP
+.B -l
+Perform only the local analysis, do not write intermediate files.
+.TP
+.B "-m f"
+Use a master definitions file, with \*U type definitions, for the
+local analyses. This can be useful in cases where the source
+being analyzed is incomplete, e.g., header files are missing.
+The user can add terse declarations of symbol names that should
+be understood to be typenames by the \*U parser.
+By convention this is done in a file named \f3_uno_.dfn\f1, which is
+placed in the same directory where \*U is invoked. The file
+may contains entries of the form:
+.DS
+UnoType bool;
+UnoType complex;
+.DE
+.IP
+which suffice to identify them as typenames to the tool, without
+requiring further detail.
+Definitions are given one per line, and terminated by a semi-colon.
+The file may also contain any standard preprocessing command
+understood by ANSI-compliant C preprocessors. This can be used to
+avoid the expansion of macro names, for instance, so that they
+can be tracked in \*U properties, e.g.:
+.DS
+#define assert(x)	Assert(x)	/* avoid macro-expansion */
+.DE
+.IP
+If the filename for the definitions file is \f3_uno_.dfn\f1, and
+the file is placed in the directory where \*U is invoked, the
+definitions file will automatically be included.
+If the file name is different, or located elsewhere, the \f3-m\f1
+option can be used.
+.TP
+.B -n
+Ignore all preprocessing directives in the source files being analyzed.
+This can be useful for analyzing output from a preprocessor, where the
+directives can be non-ANSI compliant. Cross-referencing information to
+the original source files is lost in this case.
+.TP
+.B "-p x"
+Check the \f2local\f1 property definition stored in file \f2x\f1.
+As with global checks, the property function must be
+declared as \f2void uno_check(void) {}\f1.
+.TP
+.B -s
+Print only the symbol table information for each source file, and exit.
+.TP
+.B -t
+Provide detailed function call traces for any error scenario
+found during the global analysis.
+.TP
+.B -u
+Complain about redundancies of all sorts.
+.TP
+.B -V
+Print the current \*U version number and exit.
+.TP
+.B -v
+Verbose mode, currently mostly for debugging purposes.
+.TP
+.B -w
+Picky, or lint-like, mode.
+Complains about a larger variety of things, including more
+cosmetic flaws in the code. Includes
+.B -u
+and
+.B -l .
+.TP
+.B "-x f"
+Declare f to be a function that does not return. This affects
+the control-flow of the program and can therefore be important
+for the results of the analysis.  By default, only the functions
+named
+.I exit ,
+.I fatal ,
+and
+.I panic
+are presumed not to return control to the caller.
+.SH NOTES
+Unless the
+.BI -l
+flag is used, \*U writes a small intermediate file
+at the end of the local analysis for each source file.
+The intermediate files for all source files
+enables the global analysis.
+Each intermediate file has the same base-name as
+the \f2.c\f1 source file from which it was generated,
+but with the extension \f2.uno\f1 instead of \f2.c\f1.
+\*U cleans up the intermediate files at the end of
+the global analysis. For very large source trees it
+can be beneficial to preserve the \f2.uno\f1 files in
+between subsequent analysis, so that they are only
+recreated when necessary.
+.SH SEE ALSO
+More background information on the design of the tool,
+examples of properties and applications, can be found in:
+.br
+.in +2
+G.J. Holzmann, `\*U: Static Source Code Checking for User-Defined Properties,'
+.br
+\f2Proc. IDPT 2002\f1, 6th World Conf. on Integrated Design & Process Technology,
+June 2002, Pasadena, CA.
+.in -2
+.br

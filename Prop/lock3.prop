@@ -1,0 +1,23 @@
+void
+uno_check(void)					 // handle multiple locks
+{
+	if (select("lock", FCALL, NONE))	 // find all calls to lock
+	if (select("", DEF, NONE))		 // select symbols defined in call
+	{	if (match(1, DEF, NONE)) 	 // check if any were previously marked
+			error("lock after lock"); // if so, complain
+		else
+			mark(1);		 // else mark the symbol
+	}
+
+	if (select("unlock", FCALL, NONE))	 // find all calls to unlock
+	if (select("", USE, NONE))		 // select symbols used in call
+	{	if (match(1, DEF, NONE))	 //check if previously marked
+			unmark();		 // if so, remove the mark
+		else				 // else complain
+			error("unlock without preceding lock");
+	}
+
+	if (path_ends())			 // at any return or exit statement
+	if (marked(1, ANY, NONE))		 // check if any locks in effect
+		error("lock without unlock");	 // if so, complain
+}

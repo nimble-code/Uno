@@ -1,0 +1,53 @@
+/*
+ * Underlying state machine (main part):
+ *
+ *                    .___ DEREF --> error: dereferencing uninitialized ptr
+ *                    |
+ *                    .___ free  --> error: freeing uninitialized ptr
+ *                    |
+ *	0 -- DECL --> 1 -- DEF --> 2
+ *                    ^            |
+ *                    |___ free ___|
+ */
+
+void
+uno_check(void)
+{
+	if (select("", DECL, ARRAY_DECL | DEF))
+	{	mark(1);	// mark uninitialized vars, but not arrays
+//		list("mark 1");	// debugging
+	}
+
+	if (select("", DEREF, ALIAS))	// deref, but not alias
+	if (match(1, ANY,  NONE))	// of an uninitialized var
+	{	if (known_zero())
+			error("dereferencing uninitialized ptr");
+		else
+		{	if (known_nonzero())
+				no_error();
+			else
+				error("dereferencing possibly uninitialized ptr");
+	}	}
+
+	if (select("", ALIAS, NONE))	// if an alias is taken
+	if (match(1, ANY, NONE)		// of a tracked variable
+	||  match(2, ANY, NONE))	// no matter what state
+	{	mark(3);
+	}
+
+	if (select("", DEF, DEREF))
+	if (match(1, ANY, NONE))
+	{	mark(2);	// initialized ptrs are marked 2
+	}
+
+	if (select("free", FCALL, NONE))
+	if (select("", USE, NONE))
+	if (match(1, ANY, NONE))
+		error("freeing an uninitialized ptr");
+
+	if (select("free", FCALL, NONE))
+	if (select("", USE, NONE))
+	if (match(2, ANY, NONE))
+	{	mark(1);	// this ptr is now uninitialized again
+	}
+}

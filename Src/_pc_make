@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# UNO make script for Windows PCs with Visual Studio C++ compiler (cl)
+# or alternatively with gcc
+# also required: bison, lex, rm, mv, grep (get these from www.cygwin.com)
+
+echo "expect 6 shift/reduce and 23 reduce/reduce conflicts"
+bison -v -d -o c_gram.c c_gram.y
+
+flex -C -olexer.c lexer.l
+
+CC="gcc -g"
+
+#CC="cl /nologo"
+
+$CC -DPC -DBINDIR=/usr/bin/ -o uno_local uno_local.c \
+	heap.c nmetab.c symtab.c \
+	token.c tree.c treestk.c lexer.c \
+	c_gram.c dflow.c prnttree.c uno_lts.c \
+	uno_bounds.c uno_intervals.c uno_generic.c
+
+$CC -DPC -o uno_global uno_global.c uno_fcts.c
+
+$CC -DPC -o uno uno.c
+
+rm -f *.obj *.o c_gram.[ch] c_gram.output lexer.c
+
+#
+# assuming a cygwin-like system:
+#
+
+chmod 775 *.exe
+echo "mv uno.exe uno_local.exe uno_global.exe /usr/bin"
+mv uno.exe uno_local.exe uno_global.exe /usr/bin

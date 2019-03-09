@@ -1,0 +1,18 @@
+void
+uno_check(void)
+{
+        if (uno_state == 0)
+        {       if (fct_call("qunlock"))
+                        error("unlock while unlocked");
+                if (fct_call("qlock"))
+                        uno_state = 1;
+        } else if (uno_state == 1)
+        {       if (fct_call("qlock"))
+                        error("lock while locked");
+                if (fct_call("qunlock"))
+                        uno_state = 0;
+                else if (path_ends())
+                        error("lock without unlock");
+        } else
+                error("cannot happen");
+}

@@ -1,0 +1,31 @@
+void
+uno_check(void)
+{
+	if (select("malloc", FCALL, NONE))		/* unmarked symbols of type function call */
+	{	if (select("", DEF, NONE))		/* unmarked symbols DEFined in those stmnts */
+		{	if (match(1, DEF, NONE))	/* are there matching symbols with mark 1? */
+				error("malloc follows malloc");
+			else
+				mark(1);		/* mark 1 */
+		} else
+			error("result of malloc unused");
+	} else
+
+	if (select("free", FCALL, NONE))
+	{	if (select("", USE, NONE))
+		{	if (match(1, DEF, NONE))
+				unmark();		/* remove mark */
+			else
+				error("free without malloc");
+		} else
+			error("no argument to free");
+	}
+
+	if (path_ends())
+	{	if (marked(1, ANY, NONE))
+		{	if (known_zero())
+				no_error();
+			else
+				error("malloc without free");
+	}	}
+}

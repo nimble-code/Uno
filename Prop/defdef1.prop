@@ -1,0 +1,14 @@
+/*
+ * old style functions -- not documented, but
+ * still supported for backward compatability
+ */
+
+void
+uno_check(void)	/* interpreted online by modex */
+{
+	del_track(USE, 0);
+	if (on_track(DEF, NOT_SCALAR))
+		error("def after def");
+	else
+		add_track(DEF, NOT_SCALAR);
+}

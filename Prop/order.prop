@@ -1,0 +1,11 @@
+/*
+ * catch potential order of evaluation problems
+ */
+
+void
+uno_check(void)
+{
+	if (select("", USE, DECL))
+	if (refine(DEF, NONE))
+		error("sym appears with both def and use");
+}

@@ -1,0 +1,8 @@
+void
+uno_check(void)
+{
+	if (select("", PARAM, DECL))	/* parameter uses, after decl */
+	if (refine(DEF, NONE))		/* assigning new value */
+	{	error("assignment to parameter");
+	}
+}

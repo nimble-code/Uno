@@ -8,6 +8,9 @@
 /* Software written by Gerard J. Holzmann based on the public domain      */
 /* ANSI-C parser Ctree Version 0.14 from Shaun Flisakowski                */
 
+#ifndef UNOLTS_H
+#define UNOLTS_H
+
 typedef struct Trans	Trans;
 typedef struct State	State;
 typedef struct Graphs	Graphs;
@@ -135,3 +138,5 @@ extern void	efree(void *);
 
 #define ZT	(treenode *) 0
 #define ZS	(State *) 0
+
+#endif

@@ -8,12 +8,12 @@
 /* Software written by Gerard J. Holzmann based on the public domain      */
 /* ANSI-C parser Ctree Version 0.14 from Shaun Flisakowski                */
 
+#ifndef    HEAP_H
+#define    HEAP_H
+
 #ifndef max
 #define max(a,b)	((a)>=(b)?(a):(b))
 #endif
-
-#ifndef    HEAP_H
-#define    HEAP_H
 
 #define MIN_HUNK_ARRY	  8
 #define DEFLT_RATIO	256

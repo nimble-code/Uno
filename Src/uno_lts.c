@@ -103,20 +103,21 @@ static void	putpathcond(symentry_t *);
 #endif
 static void	attach_nut(char *, symentry_t *, treenode *);
 
-extern int	has_node_type(treenode *, int);
-extern int	has_node_comp_ops(treenode *);
-extern void	dump_defuse(DefUse *, FILE *);
-extern int	v_reported(treenode *);
-extern void	dfs_bound(State *, treenode *, treenode *, State *);
-extern void	explain_bound(char *, ArBound *, treenode *);
-extern void	gen_stats(void);
-extern void	dfs_generic(State *);
-extern int	is_constant(char *);
-extern void	struct_fields(FILE *);
-extern void	bound_reset(void);
-extern void	gen_reset(void);
-extern char	*toksym(int, int);
 extern char	*buf_recur(treenode *);
+extern char	*toksym(int, int);
+extern int	has_node_comp_ops(treenode *);
+extern int	has_node_type(treenode *, int);
+extern int	is_constant(char *);
+extern int	is_recorded(char *, char *);
+extern int	v_reported(treenode *);
+extern void	bound_reset(void);
+extern void	dfs_bound(State *, treenode *, treenode *, State *);
+extern void	dfs_generic(State *);
+extern void	dump_defuse(DefUse *, FILE *);
+extern void	explain_bound(char *, ArBound *, treenode *);
+extern void	gen_reset(void);
+extern void	gen_stats(void);
+extern void	struct_fields(FILE *);
 
 int	depth = 0, saw_a_typedef_name;
 State	*uno_prop;
@@ -332,11 +333,11 @@ create_state(Graphs *g)
 }
 
 static void
-lts_push_switch(State *st)
+lts_push_switch(State *stc)
 {	SwStack *s;
 
 	s = (SwStack *) emalloc(sizeof(SwStack));
-	s->s = st;
+	s->s = stc;
 	s->nxt = swol;
 	swol = s;
 }
@@ -575,7 +576,7 @@ lts_label_find(char *s)
 
 static State *
 lts_redirect(State *s)
-{	State *st = s;
+{	State *stc = s;
 	leafnode *ln;
 	SwStack *frame;
 
@@ -600,8 +601,8 @@ lts_redirect(State *s)
 			if (s->n->hdr.tok == RETURN)
 				break;
 			if ((ln = (leafnode *) s->n->lnode) != NULL)	/* assign */
-			{	st = lts_label_find(ln->data.sval->str);
-				if (!st) st = s;
+			{	stc = lts_label_find(ln->data.sval->str);
+				if (!stc) stc = s;
 			}
 			break;
 
@@ -609,22 +610,22 @@ lts_redirect(State *s)
 		case TN_STEMNT:
 		case TN_LABEL:	/* skip fillers, if unique successor */
 			if (!s->succ)	/* not yet set, but already known to be unique */
-				st = s->nxt;
+				stc = s->nxt;
 			else if (!s->succ->nxt)
-				st = s->succ->branch;
+				stc = s->succ->branch;
 
-			if (!st) st = s;
+			if (!stc) stc = s;
 			break;
 		default:
 			break;
 	}	}
 
-	if (st != s)
-		st = lts_redirect(st);
+	if (stc != s)
+		stc = lts_redirect(stc);
 
 	stck = stck->nxt;	/* pop frame stack */
 
-	return st;
+	return stc;
 }
 
 SymRef *
@@ -1136,20 +1137,20 @@ uno_report1(FILE *fd, char *s, int t, SymExt *d)
 }
 
 static void
-add_glob(symentry_t *t, treenode *n, int st)
+add_glob(symentry_t *t, treenode *n, int stc)
 {	SymRef *r;
 
 	if (debug) printf("Adding Global %s to globs\n", t->nme->str);
 
 	for (r = globs; r; r = r->nxt)
 		if (r->sm == t)
-		{	r->status |= st;
+		{	r->status |= stc;
 			return;
 		}
 
 	r = uno_getref(t);
 	r->n = n;
-	r->status = st;
+	r->status = stc;
 	r->nxt = globs;
 	globs = r;
 }
@@ -1165,31 +1166,31 @@ on_glob(symentry_t *t)
 }
 
 static void
-mark_guse(symentry_t *t, treenode *n, int st)
+mark_guse(symentry_t *t, treenode *n, int stc)
 {	SymRef *r;
 
 	if (0)
-	printf("mark_guse: %s:%d: - %s - %d\n", n->hdr.fnm, n->hdr.line, t->nme->str, st);
+	printf("mark_guse: %s:%d: - %s - %d\n", n->hdr.fnm, n->hdr.line, t->nme->str, stc);
 
 	if (is_enum_const(t)) return;
 
 	for (r = globuse; r; r = r->nxt)
 		if (r->sm == t)
-		{	r->status |= st;
+		{	r->status |= stc;
 			return;
 		}
 
 	r = uno_getref(t);
-	r->status = st;
+	r->status = stc;
 	r->n = n;
 	r->nxt = globuse;
 	globuse = r;
 #if 0
 	/* 128 - array_decl, 64 - fct param, 2 - static, 4 - extern */
-	if (show_sharing && !(st&64) && ((st&4) || !(st&2)))
+	if (show_sharing && !(stc&64) && ((stc&4) || !(stc&2)))
 		printf("%s:%d:\t%s\t\t%s\n",
 			n->hdr.fnm, n->hdr.line, t->nme->str,
-			(st&4)?"imported":"exported");
+			(stc&4)?"imported":"exported");
 #endif
 }
 
@@ -1211,24 +1212,24 @@ uno_complain(SymRef *r, char *qualify, char *issue)
 static void
 uno_shared(void)
 {	SymRef *r;
-	int st;
+	int stc;
 	
 	for (r = globuse; r; r = r->nxt)
-	{	st = r->status;
+	{	stc = r->status;
 
 		if (Verbose
-		|| (((st&8) || (st&32)) && (st&4)))	/* imported + defined or aliased */
+		|| (((stc&8) || (stc&32)) && (stc&4)))	/* imported + defined or aliased */
 
-		if (!(st&64) && ((st&4) || !(st&2)))
+		if (!(stc&64) && ((stc&4) || !(stc&2)))
 		{
 			printf("%s:%d:\t%s\t\t%s",
 			r->n->hdr.fnm, r->n->hdr.line, r->sm->nme->str,
-			(st&4)?"imported":"exported");
+			(stc&4)?"imported":"exported");
 
-			if (st&1) printf(" U"); else printf("  ");
-			if (st&8) printf(" D"); else printf("  ");
-			if (st&32) printf(" &"); else printf("  ");
-			if (st&128) printf(" [array]");
+			if (stc&1) printf(" U"); else printf("  ");
+			if (stc&8) printf(" D"); else printf("  ");
+			if (stc&32) printf(" &"); else printf("  ");
+			if (stc&128) printf(" [array]");
 			printf("\n");
 	}	}
 }
@@ -1245,7 +1246,7 @@ uno_guse(void)
 
 	if (usecheck)
 	for (r = globuse; r; r = r->nxt)
-	{	int st;
+	{	int stc;
 
 		if (0)	printf("%s - %d \t%s:%d: <-> %s\n",
 			r->sm->nme->str,
@@ -1259,12 +1260,12 @@ uno_guse(void)
 		&&  strcmp(r->n->hdr.fnm, file_name) != 0)
 			continue;
 
-		st = r->status&~128;
-		if (r->status & 128) st |= 8; /* array decl */
+		stc = r->status&~128;
+		if (r->status & 128) stc |= 8; /* array decl */
 
-		if (!(st & 32)	/* no alias taken */
-		&&  !(st & 64))	/* no fct param */
-		switch (st) {
+		if (!(stc & 32)	/* no alias taken */
+		&&  !(stc & 64))	/* no fct param */
+		switch (stc) {
 		case   0: /* normal -def -use */
 			uno_complain(r, "", "not assigned to or used in this file");
 			break;
@@ -1581,20 +1582,20 @@ ana_locs(Graphs *g)
 }
 
 static void
-mark_defuse(symentry_t *t, treenode *n, int st)
+mark_defuse(symentry_t *t, treenode *n, int stc)
 {	SymRef *r;
 
 	for (r = curgraph->def_use; r; r = r->nxt)
 		if (r->sm == t)
-		{	r->status |= st;
-			if (n && (st & DEREF))
+		{	r->status |= stc;
+			if (n && (stc & DEREF))
 				r->n = n;
 			return;
 		}
 
 	r = uno_getref(t);
 	r->n = n;
-	r->status = st;
+	r->status = stc;
 	r->nxt = curgraph->def_use;
 	curgraph->def_use = r;
 }
@@ -2295,8 +2296,7 @@ local_var(SymList *s, treenode *n)	/* track local, uninitialized non-array objec
 
 static void
 ana_work(DefUse *d, SymList *s, treenode *n)
-{	extern int is_recorded(char *, char *);
-
+{
 	if (debug)
 	{	printf("\tanawork: %s: ", s->sm->nme->str);
 		dump_defuse(d, stdout);
@@ -3140,12 +3140,12 @@ uno_local(void)
 			if (r->status & 32)	/* address taken & at least once */
 				c = 'a';
 			else
-			{	int st = r->status&~128;
+			{	int stc = r->status&~128;
 
 				if (r->status & 128)
-					st |= 8;
+					stc |= 8;
 
-				switch(st) {
+				switch(stc) {
 				case 0:		/* normal -def -use */
 				case 4:		/* extern -def -use */
 					c = 'v';
@@ -3310,7 +3310,7 @@ lts_node(State *n, treenode *root)
 	case TN_LABEL:
 		if (root->lnode->hdr.tok == CASE
 		||  root->lnode->hdr.tok == DEFLT)	/* case label */
-		{	State *t, *st;
+		{	State *t, *stc;
 			Trans *tr;
 			leafnode *si;
 			treenode *sl, *sn;
@@ -3326,11 +3326,11 @@ lts_node(State *n, treenode *root)
 			now = add_seq(now, sl);
 			record_label(sl->lnode, now);
 
-			st = create_state(curgraph);
-			st->n = sn;		/* jump to this case */
+			stc = create_state(curgraph);
+			stc->n = sn;		/* jump to this case */
 
 			tr = get_trans();
-			tr->branch = st;
+			tr->branch = stc;
 			tr->cond = root->lnode;	/* the expr to be matched */
 			tr->nxt = t->succ;
 			t->succ = tr;
@@ -3810,24 +3810,24 @@ lts_switch(State *now, treenode *node)
 	now = lts_tree(now, node->rnode); /* process breaks and case labels */
 
 	if (!sawdefault)	/* add nil jump to end */
-	{	State *t, *st;
+	{	State *t, *stc;
 		Trans *tr;
 
 		want_break(node);
 
-		st = create_state(curgraph);
-		st->n = lts_top_end();		/* jump to endlabel */
+		stc = create_state(curgraph);
+		stc->n = lts_top_end();		/* jump to endlabel */
 
-		t = lts_top_switch(node);		/* add to switch stmnt */
+		t = lts_top_switch(node);	/* add to switch stmnt */
 
 		tr = get_trans();
-		tr->branch = st;
+		tr->branch = stc;
 		tr->cond = mk_deflt();
 
 		tr->nxt = t->succ;
 		t->succ = tr;
 
-		now = add_seq(now, st->n);
+		now = add_seq(now, stc->n);
 	}
 
 	sawdefault = osaw;

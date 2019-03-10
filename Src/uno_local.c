@@ -34,17 +34,20 @@ char	*working_dir = (char *) 0;
 
 context_t	*contxt = 0;
 
+extern char	*buf_recur(treenode *);
 extern char	*current_filename(void);
-extern void	name_scope(context_t *, char *, int);
 extern DefUse	*walk_tree(treenode *, unsigned long);
-extern void	*emalloc(size_t);
-extern void	dot_start(treenode *);
-extern void	dflow_reset(void);
-extern void	memstats(void);
 extern void	custom_exit(const char *);
-extern void	lts_start(treenode *);
-extern void	read_suppress(void);
+extern void	dflow_reset(void);
+extern void	dot_start(treenode *);
+extern void	*emalloc(size_t);
+extern void	explore(char *, treenode *);
 extern void	find_suppress_lines(char *);
+extern void	lts_start(treenode *);
+extern void	memstats(void);
+extern void	name_scope(context_t *, char *, int);
+extern void	print_recur(treenode *, FILE *);
+extern void	read_suppress(void);
 extern void	set_fnm(char *);
 
 void
@@ -359,13 +362,11 @@ process_input(char *f)
 
 		if (viewtree)
 		{	if (xrepro)
-			{	void print_recur(treenode *, FILE *);
-				print_recur(parse_tree, stdout);
+			{	print_recur(parse_tree, stdout);
 			}
 		} else
 		{	if (xrepro)
-			{	void explore(char *, treenode *);
-				explore(f, parse_tree);
+			{	explore(f, parse_tree);
 	}	}	}
 done:
 	clean_tmps();
@@ -551,6 +552,6 @@ main(int argc, char **argv)
 
 char *
 x_stmnt(treenode *n)
-{	extern char *buf_recur(treenode *);
+{
 	return buf_recur(n);
 }

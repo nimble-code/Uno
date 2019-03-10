@@ -43,7 +43,9 @@ extern void	dump_defuse(DefUse *, FILE *);
 extern int	suppress(char *, int);
 extern char	*toksym(int, int);
 extern int	unsatisfiable(ArBound *);
+extern int	get_state_val(void);
 
+extern char	*statename;
 extern State	*uno_prop;
 
 void explain_bound(char *, ArBound *, treenode *);
@@ -264,8 +266,6 @@ simple_node_type(treenode *n)
 int
 eval_const_expr(treenode *n, treenode *m)
 {	int a=0, b=0;
-	extern int get_state_val(void);
-	extern char *statename;
 
 	if (!n) return 0;
 

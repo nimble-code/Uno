@@ -23,6 +23,8 @@ extern void	fput_meta(int c, int in_str);
 extern void	fput_meta2(char *str);
 extern void	location(treenode *);
 
+extern int	has_upper(char *);
+
 static int nest;
 static char *fnm;	/* set  to filename */
 
@@ -777,8 +779,7 @@ walker(treenode *n, int level, int pre)
 	/**** rule 4.9.4 variable and function names, and tags, have no uppercase */
 	/**** rule 4.1.5 function prototypes must be declared at file scope */
 	if (pre && B_TYPE(n) == NODE_T && W_TYPE(n) == TN_FUNC_DECL)
-	{	extern int has_upper(char *);
-
+	{
 		if (n->lnode
 		&&  W_TYPE(n->lnode) == TN_IDENT)
 		{	if (has_upper(((leafnode *)n->lnode)->data.sval->str))

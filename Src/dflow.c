@@ -19,7 +19,7 @@
 #define VERY_LARGE	131072
 #define MEDIUM_LARGE	4096
 
-extern int	Verbose, uno, vis, type_check, picky;
+extern int	Verbose, uno_p, vis_p, type_check, picky;
 extern int	check_else_chains, check_compounds, xrepro;
 extern char	*want, *progname;
 
@@ -124,7 +124,7 @@ dep_graph(DefUse *d)
 {	SymList *s, *t;
 	DuG *a, *b;
 
-	if (!d || uno) return;
+	if (!d || uno_p) return;
 
 	if (!d->def)
 	for (t = d->use; t; t = t->nxt)
@@ -386,7 +386,7 @@ merge_lists(DefUse *d1, DefUse *d2)
 	if (!d2) return d1;
 
 	nd = (DefUse *) emalloc(sizeof(DefUse));
-	if (!uno)
+	if (!uno_p)
 	{	nd->def   = merge_syms(d1->def, d2->def);
 		nd->use   = merge_syms(d1->use, d2->use);
 	}
@@ -490,7 +490,7 @@ static void
 add_fbase(int ln, char *s)
 {	Fbase *f, *g;
 
-	if (!vis) return;
+	if (!vis_p) return;
 
 	if (!fbase)
 		set_fbase(0, want);
@@ -779,7 +779,7 @@ walk_tree(treenode *child, unsigned long markin)
 				leaf->syment->used = 1;
 
 			if (!leaf->syment
-			&&  uno && mark
+			&&  uno_p && mark
 			&&  leaf->data.sval)
 			{	symentry_t *t;
 
@@ -895,7 +895,7 @@ go4it:
 
 				d1 = (DefUse *) emalloc(sizeof(DefUse));
 				d1->der_type = NULL;
-				if (uno)
+				if (uno_p)
 				{	if (mark)
 					d1->other = symadd(leaf->syment, mark);
 				} else
@@ -1009,7 +1009,7 @@ go4it:
 
 			if (RealDecls
 			&& (strcmp(Fct_name, want) == 0))
-			{	if (vis)
+			{	if (vis_p)
 					set_fbase(child->hdr.line, Fct_name);
 				if (0) fprintf(stdout, "%3d: %s\n",
 					child->hdr.line, Fct_name);

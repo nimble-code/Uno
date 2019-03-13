@@ -24,7 +24,7 @@ static treenode	*parse_tree;
 static char	*cpp1, *cpp2, *cpp_cmd;
 
 int	Verbose, type_check, check_else_chains, check_compounds;
-int	uno = 4, list_typedefs, cyclo, xrepro, viewtree;
+int	uno_p = 4, list_typedefs, cyclo, xrepro, viewtree;
 int	localonly, nopaths = 1;
 int	usecheck, allerr, allerrs, lintlike, picky, show_sharing;
 int	see_static_fcts, see_extern_fcts;
@@ -389,7 +389,7 @@ main(int argc, char **argv)
 		} else if (strcmp(arg, "-c") == 0)
 		{	continue;	/* ignore */
 		} else if (strcmp(arg, "-cfg") == 0)
-		{	uno = 2;
+		{	uno_p = 2;
 			if (argc > 1 && *(*argv) != '-')
 			{	want = *argv++;
 			}

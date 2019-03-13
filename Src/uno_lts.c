@@ -1515,7 +1515,7 @@ static void
 ana_locs(Graphs *g)
 {	SymRef *r;
 
-	if (uno != 4) return;
+	if (uno_p != 4) return;
 
 	if (g)
 	for (r = g->locs; r; r = r->nxt)
@@ -2313,7 +2313,7 @@ ana_work(DefUse *d, SymList *s, treenode *n)
 	||  (s->mark & REF2))		/* x->ref2 or x.ref2 -- compounds not yet   */
 		return;
 
-	if (uno == 4)	/* the default */
+	if (uno_p == 4)	/* the default */
 		uno_bounds(s, d->aio, n);	/* array bounds */
 
 try_again:
@@ -2968,7 +2968,7 @@ gen_graph(Graphs *g)
 
 	uno_assert((dfstack == NULL), "internal error, dfstack non-zero");
 
-	if (uno == 4)	/* -U3 or -local */
+	if (uno_p == 4)	/* -U3 or -local */
 	{	if (!localonly)
 			uno_snapshot(g);	/* write the .uno file */
 		if (!uno_prop)
@@ -3081,7 +3081,7 @@ uno_local(void)
 {	Graphs *g;
 	char *z, *unof;
 
-	if (uno == 4 && !localonly)
+	if (uno_p == 4 && !localonly)
 	{	z = strstr(cur_file, ".c");
 		uno_assert((z != NULL), "bad filename");
 		*z = '\0';
@@ -3122,7 +3122,7 @@ uno_local(void)
 			gen_graph(g);	/* the local check */
 		}
 
-	if (uno == 4 && !localonly)	/* add info on globals to snapshot file */
+	if (uno_p == 4 && !localonly)	/* add info on globals to snapshot file */
 	{	SymRef *r;
 		char c;
 
@@ -3979,7 +3979,7 @@ lts_start(treenode *root)
 	for (g = graph; g; g = g->nxt)
 		prep_graph(g);	/* fixing links in cfg */
 
-	if (uno == 2)		/* -cfg    */
+	if (uno_p == 2)		/* -cfg    */
 	{	gen_dot();
 		return;
 	}

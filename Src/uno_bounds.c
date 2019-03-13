@@ -50,7 +50,7 @@ extern State	*uno_prop;
 
 void explain_bound(char *, ArBound *, treenode *);
 
-extern int	Verbose, depth, uno;
+extern int	Verbose, depth, uno_p;
 
 extern void	could_be_fct(char *);
 

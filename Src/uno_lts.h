@@ -125,7 +125,7 @@ struct PathCond {
 
 extern char	*want, *file_name;
 extern char	*x_stmnt(treenode *);
-extern int	uno, Verbose;
+extern int	uno_p, Verbose;
 
 extern leafnode	*mk_ident(void);	/* c_gram.y */
 extern treenode *mk_bool(char *);	/* c_gram.y */

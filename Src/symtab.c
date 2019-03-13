@@ -58,7 +58,7 @@ static hashtab_t  *freehtab = (hashtab_t *) 0;
 static scopetab_t *freestab = (scopetab_t *) 0;
 static symtab_t   *freesymt = (symtab_t *) 0;
 
-int vis;
+int vis_p;
 
 #ifndef DEBUG
 static char *
@@ -537,9 +537,9 @@ same:			printf("%s:%d: (scopetab %p symentry %p)", se->fn, se->ln, st, se);
 		return 1;
 
 	printf("\n===couldn't find it:===\n");
-	vis = 1;
+	vis_p = 1;
 	show_scopetab(st, 0, stdout);
-	vis = 0;
+	vis_p = 0;
 	printf("===\n\t");
 
 	return 0;
@@ -551,7 +551,7 @@ check_struct_use(FILE *fd, scopetab_t *that)
 	symentry_t *x;
 	int mustcheck, j;
 
-	vis = 1;
+	vis_p = 1;
 	if (that->htab)
 	{	mustcheck = 0;
 		for (z = that; z; z = z->parent)
@@ -787,7 +787,7 @@ st_exit_scope(symtab_t *that)
 void
 show_symtab(symtab_t *that, FILE *fp)
 {
-	vis = 1;
+	vis_p = 1;
 	show_scopetab(that->root, 0, fp);
 }
 

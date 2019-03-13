@@ -46,7 +46,7 @@ static char *tokn_end = &tokn_buff[MAX_TOKN_LEN-1];
 static char *tokn_ptr = 0;
 
 extern TreeStack *ParseStack;	/* uno_local.c */
-extern Stk_Item  *Parse_TOS;		/* uno_local.c */
+extern Stk_Item  *Parse_TOS;	/* uno_local.c */
 
 int cnt_nl(char *, int);
 extern void *emalloc(size_t);
@@ -1047,7 +1047,7 @@ yyerr(char *s)
 
 int
 yyerror(const char *s)
-{	extern int uno, allerr;
+{	extern int uno_p, allerr;
 
 	line_buf[MAX_TOKN_LEN-1] = '\0';	/* ensure temination */
 	fprintf(stderr,"%s:%d: Error (%s) before '%s'\n%s",
@@ -1057,7 +1057,7 @@ yyerror(const char *s)
 
 	err_cnt++;
 
-	if ((uno == 0 || allerr) && err_cnt >= 10)
+	if ((uno_p == 0 || allerr) && err_cnt >= 10)
 	{	fprintf(stderr,"too many errors (%d detected)\n",
 			err_cnt);
 		fclose(yyin);

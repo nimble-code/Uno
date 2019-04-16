@@ -16,14 +16,17 @@
 
 #include <unistd.h>
 #include <signal.h>
-
+#if !defined(_WIN32)
 #ifndef BINDIR
 	#define BINDIR	"/usr/local/bin"
 #endif
 
 static char *lx = BINDIR"/uno_local";
 static char *gx	= BINDIR"/uno_global";
-
+#else
+static char *lx = "uno_local";
+static char *gx	= "uno_global";
+#endif
 static int  localonly, usecheck, quiet;
 static int  glob_base, verbose, glob_prop;
 static char *w_dir;
@@ -138,7 +141,11 @@ cleanup(int unused)
 
 	if ((int) strlen(glob_cmd) > glob_base && glob_base > 5)
 	{	memset(glob_cmd, ' ', glob_base);
+#if defined(_WIN32)
+        memcpy(glob_cmd, "del /Q", 6);
+#else
 		strncpy(glob_cmd, "rm -f", 5);
+#endif
 		if (w_dir)
 		{	char *p = malloc(strlen(glob_cmd) + strlen("cd ;") + strlen(w_dir) + 1);
 			sprintf(p, "cd %s; %s\n", w_dir, glob_cmd);

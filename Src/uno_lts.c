@@ -2311,10 +2311,12 @@ ana_work(DefUse *d, SymList *s, treenode *n)
 
 	if (uno_ignore(s->sm)		/* symbol declared in "/usr/include/.." */
 	||  (s->mark & REF2))		/* x->ref2 or x.ref2 -- compounds not yet   */
-		return;
+	{	return;
+	}
 
 	if (uno_p == 4)	/* the default */
-		uno_bounds(s, d->aio, n);	/* array bounds */
+	{	uno_bounds(s, d->aio, n);	/* array bounds */
+	}
 
 try_again:
 	if (s->mark & FCALL)
@@ -2334,18 +2336,19 @@ try_again:
 			g->nxt = grst;
 			grst = g;
 		}
-
 		return;
 	} else if (is_recorded(s->sm->nme->str, n->hdr.fnm))	/* function name from prototype def */
 	{	s->mark |= FCALL;
 		goto try_again;
 	} else
-		if (debug) printf("\tnot a fcall...\n");
+	{	if (debug) printf("\tnot a fcall...\n");
+	}
 
 	if (s->sm->decl_level < FUNCTION_SCOPE)
-		global_var(s, n);
-	else
-		local_var(s, n);
+	{	global_var(s, n);
+	} else
+	{	local_var(s, n);
+	}
 }
 
 static void
@@ -2838,12 +2841,11 @@ dfs_uno(State *s)
 			dfstack->state->exp = s->n;
 			dfstack->state->val = ZT;
 		}
-
 		dfs_uno(t->branch);
 
 		if (exp)
-			prevpathcond();
-		else
+		{	prevpathcond();
+		} else
 		{	dfstack->state->nxt = pathfree;
 			pathfree = dfstack->state;
 			dfstack->state = (PathCond *) 0;

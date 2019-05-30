@@ -1820,6 +1820,7 @@ extern int
 is_recorded(char *s, char *f)
 {	Recorded *r;
 
+	if (f && strlen(f) > 0)
 	for (r = recorded; r; r = r->nxt)
 		if (strcmp(r->fct, s) == 0
 		&&  (r->isstatic == 0 || strcmp(r->fnm, f) == 0))

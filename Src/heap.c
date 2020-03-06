@@ -154,7 +154,7 @@ HeapAlloc_Gen(Heap *heap)
 			}
 	
 			heap->hunks[heap->num_hunks] =
-				(void *) emalloc(heap->chnk_sze * heap->ch_ratio);
+				(void *) emalloc((size_t) heap->chnk_sze * (size_t) heap->ch_ratio);
 	
 #ifdef DEBUG
 	printf("2 chunk allocate at %p -- %d * %d bytes\n",
@@ -171,7 +171,7 @@ HeapAlloc_Gen(Heap *heap)
 				+ (heap->chnk_sze * chnk))); 
 		}
 	} else
-	{	heap->hunks[0] = (void *) emalloc(heap->chnk_sze * heap->ch_ratio);
+	{	heap->hunks[0] = (void *) emalloc((size_t) heap->chnk_sze * (size_t) heap->ch_ratio);
 #ifdef DEBUG
 	printf("1 chunk allocate at %p -- %d * %d bytes\n",
 		heap->hunks[0], heap->chnk_sze, heap->ch_ratio);

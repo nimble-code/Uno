@@ -521,23 +521,29 @@ main(int argc, char **argv)
 		if (parse_tree
 		&&  !see_extern_fcts
 		&&  !see_static_fcts)
-			lts_start(parse_tree);		/* uno_lts.c   */
+		{	lts_start(parse_tree);	/* uno_lts.c   */
+		}
 
 		if (show_syms)
-			show_symtab(contxt->syms, stdout);
+		{	show_symtab(contxt->syms, stdout);
+		}
 
 		if (Verbose)
-			memstats();
+		{	memstats();
+		}
 
 		free_context(contxt);	/* done with this file */
 
 		while (!is_empty(ParseStack))
-			delete_stk_item(pop(ParseStack));
+		{	delete_stk_item(pop(ParseStack));
+		}
 
 		if (Verbose>1) printf("parsestack\n");
 
 		while (!is_empty(DoneStack))
-			delete_stk_item(Parse_TOS = pop(DoneStack));
+		{	delete_stk_item(Parse_TOS = pop(DoneStack));
+		}
+
 		if (Verbose>1) printf("donestack\n");
 
 		Parse_TOS  = (Stk_Item  *) 0;

@@ -25,8 +25,10 @@
 #
 BINDIR=/usr/local/bin/
 # note the terminal / in the above line is needed
+## 2019: too make extensions are made in the gcc headerfiles to allow the
+##       builtin parser to sill work reliably
 CC=gcc
-CFLAGS=-DPC -ansi -Wall -m32 -ggdb -DCPP="\"gcc -E\"" -DBINDIR=\"$(BINDIR)\"
+CFLAGS=-DPC -ansi -Wall -g -DCPP="\"gcc -E -D__extension__= -D__inline__= -D_Noreturn= -D__typeof__= \"" -DBINDIR=\"$(BINDIR)\"
 
 # on PC add:
 #	-DPC

@@ -1094,19 +1094,32 @@ n_fct:		if (has_fct_match(n, m))
 	if (strncmp((char *) m->label, "select(", strlen("select(")) == 0)
 	{
 		/* 4 args:  name, domatch, nomatch, mark */
-		/* name must be '' for now */
+		/* name must be "" or '' for now */
 		xx = strlen("select('',");
 n_sel:
-		if (!strstr((char *) m->label, "('',")
+		if ((!strstr((char *) m->label, "(\"\",")
+		  && !strstr((char *) m->label, "('',"))
 		||  !isdigit(m->label[xx]))
+		{
+ if (0)
+ { fprintf(stderr, "<%s> %d '%s' %p,%d\n", &(m->label[xx]),
+	xx, m->label,
+	strstr((char *) m->label, "('',"),
+	isdigit(m->label[xx]));
+ }
 			notyet(m, "args to select1");
-if (0) printf("<%s>\n", &(m->label[xx]));
-if (0) fflush(stdout);
+		}
 		if (sscanf((char *) &(m->label[xx]), "%d,%d", &x, &y) != 2)
-			notyet(m, "args to select2");
+		{	notyet(m, "args to select2");
+		}
 
-		if ((x|y) & ~(DEF|USE|DEREF))	/* only D, U, or R marks matter */
+		if ((x|y) & ~(DEF|USE|DEREF|PARAM))	/* only D, U, or R marks matter */
+		{
+ if (0)
+ { fprintf(stderr, "x=%d, y=%d\n", x, y);
+ }
 			notyet(m, "2nd or 3rd arg to select");
+		}
 
 		ret = has_sel_match(n, x, y);
 		if (truth == -1) ret = 1 - ret;
@@ -1153,7 +1166,9 @@ n_uno:		switch (*p) {
 		printf("\tcmd '%s' == %d\n", m->label, ret);
 		return ret;
 	}
-	notyet(m, "unrecnogized command");
+	if (debug)
+	{	notyet(m, "unrecognized command");
+	}
 	return ret;
 }
 

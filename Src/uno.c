@@ -138,7 +138,7 @@ cleanup(int unused)
 
 	if ((int) strlen(glob_cmd) > glob_base && glob_base > 5)
 	{	memset(glob_cmd, ' ', glob_base);
-		strncpy(glob_cmd, "rm -f", 5);
+		strncpy(glob_cmd, "rm -f", 5); /* replace first 5 chars */
 		if (w_dir)
 		{	char *p = malloc(strlen(glob_cmd) + strlen("cd ;") + strlen(w_dir) + 1);
 			sprintf(p, "cd %s; %s\n", w_dir, glob_cmd);

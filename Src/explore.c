@@ -55,7 +55,7 @@ explore_tree(treenode *root, int level)
 
 	if (0)
 	{	printf("%s:%4d:\t", root->hdr.fnm, root->hdr.line);
-		printf("[%d:%d:%d]\t", strlen(Xbuf), level, nest);
+		printf("[%lu:%d:%d]\t", strlen(Xbuf), level, nest);
 		printf("%s\t", name_of_nodetype(root->hdr.which));
 		printf("%s\t", name_of_node(root->hdr.type));
 		if (root->hdr.type == TN_IDENT) printf("%s", ((leafnode *)root)->data.sval->str);

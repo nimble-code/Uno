@@ -63,7 +63,8 @@ uno_usage(void)
 	fprintf(stderr, "\t-n		ignore preprocessing directives in source files\n");
 	fprintf(stderr, "\t-o arg	ignored, for modest compatability with cc arguments\n");
 	fprintf(stderr, "\t-m uno.dfn	use master (type) definitions file uno.dfn\n");
-	fprintf(stderr, "\t-x f		declare f to be a function that does not return\n\n");
+	fprintf(stderr, "\t-x f		declare f to be a function that does not return.\n"
+									"\t\t\tOptional: Add :n where n is the number of parameters.\n");
 	fprintf(stderr, "\t-V        	print version number and exit\n");
 	fprintf(stderr, "\t-s		print symbol table information and exit\n\n");
 	fprintf(stderr, "\t-l or -c	perform only local analysis, not global\n");

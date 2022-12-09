@@ -594,7 +594,7 @@ lts_redirect(State *s)
 	frame->s = s;
 	frame->nxt = stck;
 	stck = frame;
-	
+
 	if (s->n->hdr.which == NODE_T)
 	{	switch (s->n->hdr.type) {
 		case TN_JUMP:
@@ -663,20 +663,22 @@ custom_exit(const char *s)
 {	EX *nx;
 	char *col;
 
+	nx = (EX *) emalloc(sizeof(EX));
+	nx->f = (char *) emalloc(strlen(s)+1);
+	strcpy(nx->f, s);
+
 	col = strchr(s, ':');
 	if (col)
 	{	*col = '\0';
 		col++;
+		nx->has_arg = 1;
+		nx->arg_val = atoi(col);
+	}
+	else
+	{	nx->has_arg = 0;
+		nx->arg_val = 0;
 	}
 
-	nx = (EX *) emalloc(sizeof(EX));
-	nx->f = (char *) emalloc(strlen(s)+1);
-	strcpy(nx->f, s);
-	if (col)
-	{	nx->has_arg = 1;
-		nx->arg_val = atoi(col);
-	} else
-		nx->has_arg = 0;
 	nx->nxt = exs;
 	exs = nx;
 }
@@ -1213,7 +1215,7 @@ static void
 uno_shared(void)
 {	SymRef *r;
 	int stc;
-	
+
 	for (r = globuse; r; r = r->nxt)
 	{	stc = r->status;
 
@@ -3631,7 +3633,7 @@ lts_for(State *n, for_node *forn)
 			t->hdr.deftyp = forn->test->hdr.deftyp;
 #endif
 		}
-		t->cond = forn->test;	
+		t->cond = forn->test;
 		t->then_n = ts->n;		/* just for form, */
 		t->else_n = es->n;		/* the real info is in tr */
 

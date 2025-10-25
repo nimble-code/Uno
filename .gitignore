@@ -1,0 +1,8 @@
+*.o
+*.output
+Src/c_gram.c
+Src/c_gram.h
+Src/lexer.c
+Src/uno
+Src/uno_global
+Src/uno_local

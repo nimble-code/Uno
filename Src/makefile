@@ -49,6 +49,7 @@ all:	uno uno_local uno_global
 
 install: all
 	cp uno uno_local uno_global $(BINDIR)
+	cp ../Doc/uno.1 /usr/local/share/man/man1/.
 
 self_test:	c_gram.c lexer.c
 	./mk_uno_suppress

@@ -61,9 +61,10 @@ uno_usage(void)
 	fprintf(stderr, "\t-Lname	replace uno_local with name\n");
 	fprintf(stderr, "\t-Gname	replace uno_global with name\n");
 	fprintf(stderr, "\t-n		ignore preprocessing directives in source files\n");
-	fprintf(stderr, "\t-o arg	ignored, for modest compatability with cc arguments\n");
+	fprintf(stderr, "\t-o arg	ignored, for modest compatibility with cc arguments\n");
 	fprintf(stderr, "\t-m uno.dfn	use master (type) definitions file uno.dfn\n");
-	fprintf(stderr, "\t-x f		declare f to be a function that does not return\n\n");
+	fprintf(stderr, "\t-x f		declare f to be a function that does not return.\n"
+									"\t\t\tOptional: Add :n where n is the number of parameters.\n");
 	fprintf(stderr, "\t-V        	print version number and exit\n");
 	fprintf(stderr, "\t-s		print symbol table information and exit\n\n");
 	fprintf(stderr, "\t-l or -c	perform only local analysis, not global\n");
@@ -76,7 +77,9 @@ uno_usage(void)
 	fprintf(stderr, "\t-t		more detailed execution traces (global analysis)\n");
 	fprintf(stderr, "\t-u		complain about redundancies of all sorts\n");
 	fprintf(stderr, "\t-v		verbose mode (mostly for debugging)\n");
-	fprintf(stderr, "\t-w		more picky, includes -u and -t\n");
+	fprintf(stderr, "\t-w		more picky, includes -u and -t\n\n");
+	fprintf(stderr, "\tWarning can be suppressed by adding the filename and line"
+	                " number, separated by a tab, in uno_suppress file.\n" );
 	exit(1);
 }
 

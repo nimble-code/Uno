@@ -663,20 +663,22 @@ custom_exit(const char *s)
 {	EX *nx;
 	char *col;
 
+	nx = (EX *) emalloc(sizeof(EX));
+	nx->f = (char *) emalloc(strlen(s)+1);
+	strcpy(nx->f, s);
+
 	col = strchr(s, ':');
 	if (col)
 	{	*col = '\0';
 		col++;
+		nx->has_arg = 1;
+		nx->arg_val = atoi(col);
+	}
+	else
+	{	nx->has_arg = 0;
+		nx->arg_val = 0;
 	}
 
-	nx = (EX *) emalloc(sizeof(EX));
-	nx->f = (char *) emalloc(strlen(s)+1);
-	strcpy(nx->f, s);
-	if (col)
-	{	nx->has_arg = 1;
-		nx->arg_val = atoi(col);
-	} else
-		nx->has_arg = 0;
 	nx->nxt = exs;
 	exs = nx;
 }
